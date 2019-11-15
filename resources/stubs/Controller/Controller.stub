@@ -1,0 +1,114 @@
+<?php
+
+namespace $controller_namespace;
+
+use App\Repositories\AttachmentsRepository as Attachment;
+use App\Repositories\FilesRepository as File;
+use App\Repositories\Criteria\ProjectJobs\OfJob;
+use App\Repositories\ProjectJobsRepository as ProjectJob;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use $repository_namespace\$module_repository as $module_name;
+
+class $module_controller extends Controller
+{
+    private $$module_var_name;
+    private $projectJob;
+    private $attachment;
+    private $file;
+
+    /**
+     * $module_controller constructor.
+     * @param $module_name $$module_var_name
+     * @param ProjectJob $projectJob
+     * @param Attachment $attachment
+     * @param File $file
+     */
+    public function __construct(
+        $module_name $$module_var_name,
+        ProjectJob $projectJob,
+        Attachment $attachment,
+        File $file
+    ) {
+        $this->$module_var_name = $$module_var_name;
+        $this->projectJob = $projectJob;
+        $this->attachment = $attachment;
+        $this->file = $file;
+    }
+
+    public function index($jobId=0)
+    {
+        $data = [];
+        $criteria = [];
+
+        if($jobId && $projectJob = $this->projectJob->find($jobId)) {
+            $criteria[] = new OfJob($projectJob->id);
+            $data['parent'] = $projectJob;
+        }
+
+        $items = $this->$module_var_name->search($criteria)->paginate();
+        $data['items'] = $items;
+
+        return view('$module_var_plural_name.index')->with($data);
+    }
+
+    public function create($parentId)
+    {
+        $parent = $this->projectJob->find($parentId);
+        return view('$module_var_plural_name.create')->with(compact('parent'));
+    }
+
+    public function store(Request $request)
+    {
+        $$module_var_name = $this->$module_var_name->create($request->all());
+
+        // 生成选择目录式的附件
+//        $this->attachment->createOrUpdateFirstOne($$module_var_name, $request);
+
+        // 生成单文件类型的附件
+//        $this->file->updateFileableInfo($$module_var_name);
+
+        // 生成多字段的附件
+//        $this->file->updateMultiFileableInfo($$module_var_name, $request);
+        return response()->success();
+    }
+
+    public function show($id)
+    {
+        $item = $this->$module_var_name->find($id);
+        return view('$module_var_plural_name.show')->with(compact('item'));
+    }
+
+    public function edit($id)
+    {
+        $item = $this->$module_var_name->find($id);
+        return view('$module_var_plural_name.edit')->with(compact('item'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $this->$module_var_name->findUpdate($request->all(), $id);
+        $$module_var_name = $this->$module_var_name->find($id);
+
+        // 修改选择目录式的附件
+//        $this->attachment->createOrUpdateFirstOne($$module_var_name, $request);
+
+        // 生成单文件类型的附件
+//        $this->file->updateFileableInfo($$module_var_name);
+
+        // 生成多字段的附件
+//        $this->file->updateMultiFileableInfo($$module_var_name, $request);
+        return response()->success();
+    }
+
+    public function destroy($id)
+    {
+        $this->$module_var_name->findDelete($id);
+        return response()->success();
+    }
+
+    public function search()
+    {
+        return view('$module_var_plural_name.search');
+    }
+}
